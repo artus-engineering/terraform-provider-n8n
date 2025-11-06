@@ -24,9 +24,18 @@ func TestCredentialResourceSchema(t *testing.T) {
 	// Validate the schema
 	validateSchemaAttributeExists(t, schemaResponse.Schema, "id")
 	validateSchemaAttributeExists(t, schemaResponse.Schema, "name")
-	validateSchemaAttributeExists(t, schemaResponse.Schema, "type")
-	validateSchemaAttributeExists(t, schemaResponse.Schema, "data")
 	validateSchemaAttributeExists(t, schemaResponse.Schema, "nodes_access")
+	
+	// Validate blocks exist
+	if _, ok := schemaResponse.Schema.Blocks["basic_auth"]; !ok {
+		t.Errorf("missing block: basic_auth")
+	}
+	if _, ok := schemaResponse.Schema.Blocks["oauth2"]; !ok {
+		t.Errorf("missing block: oauth2")
+	}
+	if _, ok := schemaResponse.Schema.Blocks["header_auth"]; !ok {
+		t.Errorf("missing block: header_auth")
+	}
 }
 
 func validateSchemaAttributeExists(t *testing.T, s schema.Schema, attributeName string) {

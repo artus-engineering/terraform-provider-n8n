@@ -1,6 +1,6 @@
 module github.com/artus-engineering/terraform-provider-n8n
 
-go 1.19
+go 1.25
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.5.0

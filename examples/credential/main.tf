@@ -13,28 +13,25 @@ provider "n8n" {
 
 # Example: HTTP Basic Auth credential
 resource "n8n_credential" "http_basic" {
-  name = "example-http-basic-auth-awfw"
-  type = "httpBasicAuth"
-  data = jsonencode({
-    user     = "myusername1"
+  name = "example-http-basic-auth"
+
+  basic_auth {
+    username = "myusername"
     password = "mypassword"
-  })
+  }
 }
 
 # Example: OAuth2 API credential
 resource "n8n_credential" "oauth2" {
   name = "example-oauth2"
-  type = "oAuth2Api"
-  data = jsonencode({
-    clientId                     = "your-client-id"
-    clientSecret                 = "your-client-secret"
-    accessTokenUrl               = "https://example.com/oauth/token"
-    authUrl                      = "https://example.com/oauth/authorize"
-    scope                        = "read write"
-    authQueryParameters          = ""
-    sendAdditionalBodyProperties = false
-    additionalBodyProperties     = ""
-  })
+
+  oauth2 {
+    client_id        = "your-client-id"
+    client_secret    = "your-client-secret"
+    access_token_url = "https://example.com/oauth/token"
+    auth_url         = "https://example.com/oauth/authorize"
+    scope            = "read write"
+  }
 
   nodes_access = ["httpRequest"]
 }
@@ -42,10 +39,10 @@ resource "n8n_credential" "oauth2" {
 # Example: HTTP Header Auth credential
 resource "n8n_credential" "http_header" {
   name = "example-http-header"
-  type = "httpHeaderAuth"
-  data = jsonencode({
+
+  header_auth {
     name  = "Authorization"
     value = "Bearer your-token-here"
-  })
+  }
 }
 

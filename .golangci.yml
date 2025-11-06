@@ -1,22 +1,19 @@
+version: 2
+
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
-    - gofmt
-    - goimports
     - misspell
     - unconvert
     - gosec
     - errname
     - errorlint
-    - exportloopref
     - gocritic
     - goconst
-    - gofumpt
 
 linters-settings:
   errcheck:
@@ -31,10 +28,6 @@ linters-settings:
       - style
   gosec:
     severity: medium
-  govet:
-    check-shadowing: true
-  gofumpt:
-    extra-rules: true
 
 issues:
   exclude-rules:

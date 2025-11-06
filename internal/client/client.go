@@ -34,6 +34,7 @@ func NewClient(host, apiKey *string, insecure *bool) (*Client, error) {
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
+			//nolint:gosec // G402: InsecureSkipVerify is configurable by user for testing/development
 			InsecureSkipVerify: insecure != nil && *insecure,
 		},
 	}
@@ -76,7 +77,10 @@ func (c *Client) doRequest(method, endpoint string, body interface{}) ([]byte, e
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		//nolint:errcheck // Error closing response body is not critical
+		_ = resp.Body.Close()
+	}()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
