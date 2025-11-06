@@ -10,6 +10,7 @@ on:
       - go.*
       - internal/**
       - Makefile
+      - .github/workflows/test.yml
 
 permissions:
   contents: read
