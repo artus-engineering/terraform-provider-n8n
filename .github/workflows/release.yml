@@ -1,9 +1,12 @@
 name: Release Provider
 
 on:
-    push:
-        tags:
-            - "v*"
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Version number (e.g., 0.1.0)"
+                required: true
+                type: string
 
 permissions:
     contents: write
@@ -15,18 +18,33 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+                  token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Set up Go
               uses: actions/setup-go@v6
               with:
                   go-version: "1.25"
 
-            - name: Extract version from tag
+            - name: Set version
               id: version
               run: |
-                  VERSION=${GITHUB_REF#refs/tags/v}
+                  VERSION="${{ inputs.version }}"
+                  # Remove 'v' prefix if present
+                  VERSION=${VERSION#v}
                   echo "version=$VERSION" >> $GITHUB_OUTPUT
+                  echo "tag=v$VERSION" >> $GITHUB_OUTPUT
                   echo "Version: $VERSION"
+                  echo "Tag: v$VERSION"
+
+            - name: Create and push tag
+              run: |
+                  TAG="v${{ steps.version.outputs.version }}"
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git tag -a "$TAG" -m "Release $TAG"
+                  git push origin "$TAG"
 
             - name: Build provider for multiple platforms
               env:
@@ -51,8 +69,7 @@ jobs:
                   VERSION: ${{ steps.version.outputs.version }}
               run: |
                   cd dist
-                  sha256sum terraform-provider-n8n_* > terraform-provider-n8n_${VERSION}_SHA256SUMS
-                  sed -i 's/  / */' terraform-provider-n8n_${VERSION}_SHA256SUMS
+                  sha256sum terraform-provider-n8n_${VERSION}_* | grep -v SHA256SUMS | sed 's/^/*/' > terraform-provider-n8n_${VERSION}_SHA256SUMS
 
             - name: Generate Terraform Registry Manifest
               env:
@@ -121,7 +138,9 @@ jobs:
               run: |
                   if [ -n "$GPG_PRIVATE_KEY" ]; then
                     echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --pinentry-mode loopback --import
-                    gpg --detach-sign --armor --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" dist/terraform-provider-n8n_${VERSION}_SHA256SUMS
+                    cd dist
+                    gpg --detach-sign --armor --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" terraform-provider-n8n_${VERSION}_SHA256SUMS
+                    mv terraform-provider-n8n_${VERSION}_SHA256SUMS.asc terraform-provider-n8n_${VERSION}_SHA256SUMS.sig
                   else
                     echo "GPG signing skipped (no GPG_PRIVATE_KEY secret set)"
                   fi
@@ -129,8 +148,8 @@ jobs:
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v2
               with:
-                  tag_name: ${{ github.ref_name }}
-                  name: Release v${{ steps.version.outputs.version }}
+                  tag_name: ${{ steps.version.outputs.tag }}
+                  name: Release ${{ steps.version.outputs.tag }}
                   body: |
                       ## Terraform Provider n8n v${{ steps.version.outputs.version }}
 
@@ -151,5 +170,6 @@ jobs:
                   files: |
                       dist/terraform-provider-n8n_*
                       dist/terraform-registry-manifest.json
+                      dist/terraform-provider-n8n_*_SHA256SUMS*
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
