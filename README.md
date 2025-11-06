@@ -336,18 +336,15 @@ make check
 
 The release process is automated via GitHub Actions. To create a new release:
 
-1. **Create a version tag locally**:
-   ```bash
-   git tag v0.1.0
-   ```
-
-2. **Push the tag to the remote repository**:
-   ```bash
-   git push origin --tags
-   ```
+1. **Go to the Actions tab** in your GitHub repository
+2. **Select "Release Provider"** workflow from the left sidebar
+3. **Click "Run workflow"** button
+4. **Enter the version number** (e.g., `0.1.0` or `v0.1.0` - both formats are accepted)
+5. **Click "Run workflow"** to start the release process
 
 The GitHub Actions workflow (`.github/workflows/release.yml`) will automatically:
 
+- Create and push a version tag (e.g., `v0.1.0`)
 - Build the provider for multiple platforms:
   - Linux (amd64, arm64)
   - macOS (amd64, arm64)
@@ -359,7 +356,7 @@ The GitHub Actions workflow (`.github/workflows/release.yml`) will automatically
 
 The release will be available on GitHub and can be used by Terraform once published to the Terraform Registry.
 
-**Note**: Tag names must follow the format `v*` (e.g., `v0.1.0`, `v1.0.0`) to trigger the release workflow.
+**Note**: The workflow will fail if you try to create a release with a version that already has a tag, preventing duplicate releases.
 
 ## Contributing
 
