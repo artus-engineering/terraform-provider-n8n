@@ -95,8 +95,9 @@ jobs:
                   if [ -n "$GPG_PRIVATE_KEY" ] && [ -f "dist/terraform-provider-n8n_${VERSION}_SHA256SUMS" ]; then
                     echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --pinentry-mode loopback --import
                     cd dist
-                    gpg --detach-sign --armor --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --output "terraform-provider-n8n_${VERSION}_SHA256SUMS.sig" "terraform-provider-n8n_${VERSION}_SHA256SUMS"
-                    echo "Re-signed checksums file"
+                    # Use binary signature (no --armor flag) for Terraform Registry compatibility
+                    gpg --detach-sign --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --output "terraform-provider-n8n_${VERSION}_SHA256SUMS.sig" "terraform-provider-n8n_${VERSION}_SHA256SUMS"
+                    echo "Re-signed checksums file with binary signature"
                   fi
 
             - name: Update release with formatted checksums and manifest
