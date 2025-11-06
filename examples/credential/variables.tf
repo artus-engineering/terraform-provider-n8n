@@ -9,4 +9,3 @@ variable "n8n_api_key" {
   type        = string
   sensitive   = true
 }
-

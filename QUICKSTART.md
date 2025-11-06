@@ -175,4 +175,3 @@ The n8n API endpoint might be incorrect, or your n8n instance doesn't have the A
 - Check out the [examples](./examples/) directory for more use cases
 - Read the full [README](./README.md) for detailed documentation
 - Review the [n8n API documentation](https://docs.n8n.io/api/) for available credential types
-

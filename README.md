@@ -103,7 +103,7 @@ resource "n8n_credential" "oauth2" {
     sendAdditionalBodyProperties = false
     additionalBodyProperties  = ""
   })
-  
+
   nodes_access = ["httpRequest"]
 }
 ```

@@ -48,6 +48,10 @@ docs:
 	@echo "==> Generating documentation..."
 	@go generate ./...
 
+# Run pre-commit hooks on all files
+pre-commit:
+	@echo "==> Running pre-commit hooks..."
+	@pre-commit run --all-files
+
 # Run all checks
 check: fmt vet lint test
-

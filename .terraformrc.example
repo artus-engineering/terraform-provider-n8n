@@ -10,4 +10,3 @@ provider_installation {
   # registries as normal.
   direct {}
 }
-

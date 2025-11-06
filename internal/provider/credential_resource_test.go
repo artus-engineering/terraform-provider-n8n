@@ -25,7 +25,7 @@ func TestCredentialResourceSchema(t *testing.T) {
 	validateSchemaAttributeExists(t, schemaResponse.Schema, "id")
 	validateSchemaAttributeExists(t, schemaResponse.Schema, "name")
 	validateSchemaAttributeExists(t, schemaResponse.Schema, "nodes_access")
-	
+
 	// Validate blocks exist
 	if _, ok := schemaResponse.Schema.Blocks["basic_auth"]; !ok {
 		t.Errorf("missing block: basic_auth")

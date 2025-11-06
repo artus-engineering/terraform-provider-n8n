@@ -45,4 +45,3 @@ resource "n8n_credential" "http_header" {
     value = "Bearer your-token-here"
   }
 }
-

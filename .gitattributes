@@ -13,4 +13,3 @@ Makefile text eol=lf
 # Force Unix line endings for Terraform files
 *.tf text eol=lf
 *.tfvars text eol=lf
-

@@ -1,0 +1,34 @@
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+
+  # Go formatting and linting via Makefile
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: Go Format (make fmt)
+        entry: bash -c 'make fmt'
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: go-lint
+        name: Go Lint (make lint)
+        entry: bash -c 'make lint'
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # Terraform formatting
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.103.0
+    hooks:
+      - id: terraform_fmt
