@@ -146,7 +146,7 @@ func (p *n8nProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	tflog.Debug(ctx, "Creating n8n client")
 
 	// Create a new n8n client using the configuration values
-	client, err := client.NewClient(&host, &apiKey, &insecure)
+	n8nClient, err := client.NewClient(&host, &apiKey, &insecure)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Create n8n API Client",
@@ -159,8 +159,8 @@ func (p *n8nProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	// Make the n8n client available during DataSource and Resource
 	// type Configure methods.
-	resp.ResourceData = client
-	resp.DataSourceData = client
+	resp.ResourceData = n8nClient
+	resp.DataSourceData = n8nClient
 
 	tflog.Info(ctx, "Configured n8n client", map[string]any{"success": true})
 }

@@ -235,7 +235,7 @@ func (r *credentialResource) Configure(_ context.Context, req resource.Configure
 		return
 	}
 
-	client, ok := req.ProviderData.(*client.Client)
+	n8nClient, ok := req.ProviderData.(*client.Client)
 
 	if !ok {
 		resp.Diagnostics.AddError(
@@ -246,10 +246,12 @@ func (r *credentialResource) Configure(_ context.Context, req resource.Configure
 		return
 	}
 
-	r.client = client
+	r.client = n8nClient
 }
 
 // Create creates the resource and sets the initial Terraform state.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (r *credentialResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan credentialResourceModel
 	diags := req.Plan.Get(ctx, &plan)
@@ -346,6 +348,8 @@ func (r *credentialResource) Create(ctx context.Context, req resource.CreateRequ
 // Read refreshes the Terraform state with the latest data.
 // Note: n8n API may not support reading credentials for security reasons.
 // If reading fails, we keep the existing state to avoid breaking Terraform operations.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (r *credentialResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state credentialResourceModel
 	diags := req.State.Get(ctx, &state)
@@ -417,6 +421,8 @@ func (r *credentialResource) Read(ctx context.Context, req resource.ReadRequest,
 
 // Update updates the resource and sets the updated Terraform state on success.
 // Note: Updates are handled via replacement (delete and recreate) due to n8n API limitations.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (r *credentialResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan credentialResourceModel
 	diags := req.Plan.Get(ctx, &plan)
@@ -518,6 +524,8 @@ func (r *credentialResource) Update(ctx context.Context, req resource.UpdateRequ
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (r *credentialResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state credentialResourceModel
 	diags := req.State.Get(ctx, &state)
@@ -552,6 +560,8 @@ func (r *credentialResource) ImportState(ctx context.Context, req resource.Impor
 // ModifyPlan validates that exactly one credential block is provided.
 // This runs during plan time to validate the configuration before Terraform
 // validates nested block attributes.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (r *credentialResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
 	// Skip validation during destroy or if plan is null
 	if req.Plan.Raw.IsNull() {
@@ -696,6 +706,8 @@ func (r *credentialResource) ModifyPlan(ctx context.Context, req resource.Modify
 }
 
 // validateCredentialBlocks ensures exactly one credential block is defined.
+//
+//nolint:gocritic // model parameter passed by value for clarity and immutability
 func validateCredentialBlocks(ctx context.Context, model credentialResourceModel) (string, map[string]interface{}, error) {
 	blocksDefined := 0
 	var credentialType string
@@ -789,6 +801,8 @@ func (m *requiresReplaceListModifier) MarkdownDescription(ctx context.Context) s
 }
 
 // PlanModifyList implements the plan modification logic.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (m *requiresReplaceListModifier) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
 	// If the attribute is being removed or changed, require replacement
 	if !req.StateValue.IsNull() && !req.PlanValue.IsNull() {
@@ -817,6 +831,8 @@ func (m *requiresReplaceObjectModifier) MarkdownDescription(ctx context.Context)
 }
 
 // PlanModifyObject implements the plan modification logic.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (m *requiresReplaceObjectModifier) PlanModifyObject(ctx context.Context, req planmodifier.ObjectRequest, resp *planmodifier.ObjectResponse) {
 	// If the attribute is being removed or changed, require replacement
 	if !req.StateValue.IsNull() && !req.PlanValue.IsNull() {
@@ -845,6 +861,8 @@ func (m *requiresReplaceBoolModifier) MarkdownDescription(ctx context.Context) s
 }
 
 // PlanModifyBool implements the plan modification logic.
+//
+//nolint:gocritic // req parameter signature required by terraform-plugin-framework interface
 func (m *requiresReplaceBoolModifier) PlanModifyBool(ctx context.Context, req planmodifier.BoolRequest, resp *planmodifier.BoolResponse) {
 	// If the attribute is being changed, require replacement
 	if !req.StateValue.IsNull() && !req.PlanValue.IsNull() {
