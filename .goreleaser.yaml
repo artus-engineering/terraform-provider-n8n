@@ -1,0 +1,59 @@
+# GoReleaser configuration for Terraform Provider n8n
+# https://goreleaser.com
+
+project_name: terraform-provider-n8n
+
+builds:
+  - id: terraform-provider-n8n
+    main: .
+    # Version without 'v' prefix for binary name
+    binary: terraform-provider-n8n_{{ trimPrefix .Tag "v" }}_{{ .Os }}_{{ .Arch }}{{ if eq .Os "windows" }}.exe{{ end }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -X main.version={{ trimPrefix .Tag "v" }}
+    env:
+      - CGO_ENABLED=0
+
+# Don't create archives, upload binaries directly
+archives: []
+
+checksum:
+  algorithm: sha256
+  name_template: terraform-provider-n8n_{{ trimPrefix .Tag "v" }}_SHA256SUMS
+
+# Signing will be handled in the workflow after formatting checksums
+# signs: []
+
+release:
+  mode: replace
+  header: |
+    ## Terraform Provider n8n {{ .Tag }}
+
+    This release includes the Terraform provider for n8n.
+
+    ### Installation
+
+    ```hcl
+    terraform {
+      required_providers {
+        n8n = {
+          source  = "artus-engineering/n8n"
+          version = "{{ trimPrefix .Tag "v" }}"
+        }
+      }
+    }
+    ```
+  footer: |
+    ## Checksums
+
+    SHA256 checksums for verification:
+
+    ```
+    {{ .Checksums }}
+    ```

@@ -10,6 +10,7 @@ on:
 
 permissions:
     contents: write
+    id-token: write
 
 jobs:
     release:
@@ -27,49 +28,34 @@ jobs:
               with:
                   go-version: "1.25"
 
-            - name: Set version
+            - name: Set version and create tag
               id: version
               run: |
                   VERSION="${{ inputs.version }}"
                   # Remove 'v' prefix if present
                   VERSION=${VERSION#v}
+                  TAG="v$VERSION"
                   echo "version=$VERSION" >> $GITHUB_OUTPUT
-                  echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+                  echo "tag=$TAG" >> $GITHUB_OUTPUT
                   echo "Version: $VERSION"
-                  echo "Tag: v$VERSION"
+                  echo "Tag: $TAG"
 
-            - name: Create and push tag
-              run: |
-                  TAG="v${{ steps.version.outputs.version }}"
+                  # Create and push tag
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
                   git tag -a "$TAG" -m "Release $TAG"
                   git push origin "$TAG"
 
-            - name: Build provider for multiple platforms
+            - name: Run GoReleaser
+              uses: goreleaser/goreleaser-action@v5
+              with:
+                  version: latest
+                  args: release --clean
               env:
-                  VERSION: ${{ steps.version.outputs.version }}
-              run: |
-                  mkdir -p dist
-
-                  # Build for Linux
-                  GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=$VERSION" -o dist/terraform-provider-n8n_${VERSION}_linux_amd64
-                  GOOS=linux GOARCH=arm64 go build -ldflags "-X main.version=$VERSION" -o dist/terraform-provider-n8n_${VERSION}_linux_arm64
-
-                  # Build for macOS
-                  GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=$VERSION" -o dist/terraform-provider-n8n_${VERSION}_darwin_amd64
-                  GOOS=darwin GOARCH=arm64 go build -ldflags "-X main.version=$VERSION" -o dist/terraform-provider-n8n_${VERSION}_darwin_arm64
-
-                  # Build for Windows
-                  GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=$VERSION" -o dist/terraform-provider-n8n_${VERSION}_windows_amd64.exe
-                  GOOS=windows GOARCH=arm64 go build -ldflags "-X main.version=$VERSION" -o dist/terraform-provider-n8n_${VERSION}_windows_arm64.exe
-
-            - name: Generate SHA256 checksums
-              env:
-                  VERSION: ${{ steps.version.outputs.version }}
-              run: |
-                  cd dist
-                  sha256sum terraform-provider-n8n_${VERSION}_* | grep -v SHA256SUMS | sed 's/^/*/' > terraform-provider-n8n_${VERSION}_SHA256SUMS
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GPG_PRIVATE_KEY: ${{ secrets.HASHICORP_GPG_PRIVATE_KEY }}
+                  GPG_PASSPHRASE: ${{ secrets.HASHICORP_GPG_PASSPHRASE }}
+              if: ${{ steps.version.outputs.tag }}
 
             - name: Generate Terraform Registry Manifest
               env:
@@ -78,97 +64,49 @@ jobs:
                   cd dist
                   cat > terraform-registry-manifest.json <<EOF
                   {
-                    "version": "${VERSION}",
+                    "version": 1,
                     "metadata": {
-                      "protocol_versions": ["5.0"]
-                    },
-                    "providers": [
-                      {
-                        "os": "linux",
-                        "arch": "amd64",
-                        "filename": "terraform-provider-n8n_${VERSION}_linux_amd64",
-                        "download_url": "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/terraform-provider-n8n_${VERSION}_linux_amd64",
-                        "shasum": "$(sha256sum terraform-provider-n8n_${VERSION}_linux_amd64 | cut -d' ' -f1)"
-                      },
-                      {
-                        "os": "linux",
-                        "arch": "arm64",
-                        "filename": "terraform-provider-n8n_${VERSION}_linux_arm64",
-                        "download_url": "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/terraform-provider-n8n_${VERSION}_linux_arm64",
-                        "shasum": "$(sha256sum terraform-provider-n8n_${VERSION}_linux_arm64 | cut -d' ' -f1)"
-                      },
-                      {
-                        "os": "darwin",
-                        "arch": "amd64",
-                        "filename": "terraform-provider-n8n_${VERSION}_darwin_amd64",
-                        "download_url": "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/terraform-provider-n8n_${VERSION}_darwin_amd64",
-                        "shasum": "$(sha256sum terraform-provider-n8n_${VERSION}_darwin_amd64 | cut -d' ' -f1)"
-                      },
-                      {
-                        "os": "darwin",
-                        "arch": "arm64",
-                        "filename": "terraform-provider-n8n_${VERSION}_darwin_arm64",
-                        "download_url": "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/terraform-provider-n8n_${VERSION}_darwin_arm64",
-                        "shasum": "$(sha256sum terraform-provider-n8n_${VERSION}_darwin_arm64 | cut -d' ' -f1)"
-                      },
-                      {
-                        "os": "windows",
-                        "arch": "amd64",
-                        "filename": "terraform-provider-n8n_${VERSION}_windows_amd64.exe",
-                        "download_url": "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/terraform-provider-n8n_${VERSION}_windows_amd64.exe",
-                        "shasum": "$(sha256sum terraform-provider-n8n_${VERSION}_windows_amd64.exe | cut -d' ' -f1)"
-                      },
-                      {
-                        "os": "windows",
-                        "arch": "arm64",
-                        "filename": "terraform-provider-n8n_${VERSION}_windows_arm64.exe",
-                        "download_url": "https://github.com/${{ github.repository }}/releases/download/v${VERSION}/terraform-provider-n8n_${VERSION}_windows_arm64.exe",
-                        "shasum": "$(sha256sum terraform-provider-n8n_${VERSION}_windows_arm64.exe | cut -d' ' -f1)"
-                      }
-                    ]
+                      "protocol_versions": ["5.0", "6.0"]
+                    }
                   }
                   EOF
+                  echo "Generated manifest file:"
                   cat terraform-registry-manifest.json
 
-            - name: Sign checksums
+            - name: Format checksums for Terraform Registry
+              env:
+                  VERSION: ${{ steps.version.outputs.version }}
+              run: |
+                  cd dist
+                  if [ -f "terraform-provider-n8n_${VERSION}_SHA256SUMS" ]; then
+                    # Add asterisk prefix to each line (Terraform Registry requirement)
+                    sed 's/^/*/' "terraform-provider-n8n_${VERSION}_SHA256SUMS" > "terraform-provider-n8n_${VERSION}_SHA256SUMS.tmp"
+                    mv "terraform-provider-n8n_${VERSION}_SHA256SUMS.tmp" "terraform-provider-n8n_${VERSION}_SHA256SUMS"
+                    echo "Formatted checksums file:"
+                    cat "terraform-provider-n8n_${VERSION}_SHA256SUMS"
+                  fi
+
+            - name: Re-sign checksums after formatting
               env:
                   VERSION: ${{ steps.version.outputs.version }}
                   GPG_PRIVATE_KEY: ${{ secrets.HASHICORP_GPG_PRIVATE_KEY }}
                   GPG_PASSPHRASE: ${{ secrets.HASHICORP_GPG_PASSPHRASE }}
               run: |
-                  if [ -n "$GPG_PRIVATE_KEY" ]; then
+                  if [ -n "$GPG_PRIVATE_KEY" ] && [ -f "dist/terraform-provider-n8n_${VERSION}_SHA256SUMS" ]; then
                     echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --pinentry-mode loopback --import
                     cd dist
-                    gpg --detach-sign --armor --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" terraform-provider-n8n_${VERSION}_SHA256SUMS
-                    mv terraform-provider-n8n_${VERSION}_SHA256SUMS.asc terraform-provider-n8n_${VERSION}_SHA256SUMS.sig
-                  else
-                    echo "GPG signing skipped (no GPG_PRIVATE_KEY secret set)"
+                    gpg --detach-sign --armor --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --output "terraform-provider-n8n_${VERSION}_SHA256SUMS.sig" "terraform-provider-n8n_${VERSION}_SHA256SUMS"
+                    echo "Re-signed checksums file"
                   fi
 
-            - name: Create GitHub Release
+            - name: Update release with formatted checksums and manifest
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ steps.version.outputs.tag }}
-                  name: Release ${{ steps.version.outputs.tag }}
-                  body: |
-                      ## Terraform Provider n8n v${{ steps.version.outputs.version }}
-
-                      This release includes the Terraform provider for n8n.
-
-                      ### Installation
-
-                      ```hcl
-                      terraform {
-                        required_providers {
-                          n8n = {
-                            source  = "artus-engineering/n8n"
-                            version = "${{ steps.version.outputs.version }}"
-                          }
-                        }
-                      }
-                      ```
                   files: |
-                      dist/terraform-provider-n8n_*
+                      dist/terraform-provider-n8n_*_SHA256SUMS*
                       dist/terraform-registry-manifest.json
+                  overwrite_files: true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              if: ${{ steps.version.outputs.tag }}
