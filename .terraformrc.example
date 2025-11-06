@@ -1,0 +1,13 @@
+# Example Terraform CLI configuration file
+# Copy this to ~/.terraformrc (or %APPDATA%\terraform.rc on Windows)
+
+provider_installation {
+  dev_overrides {
+    "artus-engineering/n8n" = "/path/to/terraform-provider-n8n"
+  }
+
+  # For all other providers, install them directly from their origin provider
+  # registries as normal.
+  direct {}
+}
+

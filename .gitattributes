@@ -1,0 +1,16 @@
+# Set default behavior to automatically normalize line endings.
+* text=auto
+
+# Force Unix line endings for shell scripts
+*.sh text eol=lf
+
+# Force Unix line endings for Makefiles
+Makefile text eol=lf
+
+# Force Unix line endings for Go files
+*.go text eol=lf
+
+# Force Unix line endings for Terraform files
+*.tf text eol=lf
+*.tfvars text eol=lf
+

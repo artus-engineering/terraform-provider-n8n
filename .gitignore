@@ -30,3 +30,12 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Terraform provider binary
+terraform-provider-n8n
+terraform-provider-n8n.exe
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform
