@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Test](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml/badge.svg)](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Terraform Registry](https://img.shields.io/github/v/release/artus-engineering/terraform-provider-n8n?label=Latest%Version)](https://registry.terraform.io/providers/artus-engineering/n8n/latest)
+[![Terraform Registry](https://img.shields.io/github/v/release/artus-engineering/terraform-provider-n8n?label=Latest%20Version)](https://registry.terraform.io/providers/artus-engineering/n8n/latest) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Test](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml/badge.svg)](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml)
 
 </div>
 
