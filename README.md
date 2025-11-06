@@ -4,7 +4,7 @@
 
 </div>
 
-# Terraform Provider for n8n
+<h1 align="center">Terraform Provider for n8n</h1>
 
 A Terraform provider for managing n8n resources.
 
