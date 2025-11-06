@@ -120,8 +120,8 @@ jobs:
                   GPG_PASSPHRASE: ${{ secrets.HASHICORP_GPG_PASSPHRASE }}
               run: |
                   if [ -n "$GPG_PRIVATE_KEY" ]; then
-                    echo "$GPG_PRIVATE_KEY" | gpg --import
-                    gpg --detach-sign --armor --batch --yes --passphrase "$GPG_PASSPHRASE" dist/terraform-provider-n8n_${VERSION}_SHA256SUMS
+                    echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --pinentry-mode loopback --import
+                    gpg --detach-sign --armor --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" dist/terraform-provider-n8n_${VERSION}_SHA256SUMS
                   else
                     echo "GPG signing skipped (no GPG_PRIVATE_KEY secret set)"
                   fi

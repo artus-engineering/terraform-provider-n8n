@@ -332,6 +332,35 @@ make fmt
 make check
 ```
 
+## Releasing
+
+The release process is automated via GitHub Actions. To create a new release:
+
+1. **Create a version tag locally**:
+   ```bash
+   git tag v0.1.0
+   ```
+
+2. **Push the tag to the remote repository**:
+   ```bash
+   git push origin --tags
+   ```
+
+The GitHub Actions workflow (`.github/workflows/release.yml`) will automatically:
+
+- Build the provider for multiple platforms:
+  - Linux (amd64, arm64)
+  - macOS (amd64, arm64)
+  - Windows (amd64, arm64)
+- Generate SHA256 checksums for all binaries
+- Generate a Terraform Registry manifest
+- Sign checksums (if GPG keys are configured)
+- Create a GitHub Release with all artifacts
+
+The release will be available on GitHub and can be used by Terraform once published to the Terraform Registry.
+
+**Note**: Tag names must follow the format `v*` (e.g., `v0.1.0`, `v1.0.0`) to trigger the release workflow.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
