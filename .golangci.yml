@@ -27,12 +27,12 @@ linters:
         - style
     gosec:
       severity: medium
-
-exclude-rules:
-  - path: _test.go
-    linters:
-      - errcheck
-      - gosec
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
 
 issues:
   max-issues-per-linter: 0

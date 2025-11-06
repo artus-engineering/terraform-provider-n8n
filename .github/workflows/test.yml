@@ -5,6 +5,11 @@ on:
     branches:
       - main
   pull_request:
+    paths:
+      - main.go
+      - go.*
+      - internal/**
+      - Makefile
 
 jobs:
   test:

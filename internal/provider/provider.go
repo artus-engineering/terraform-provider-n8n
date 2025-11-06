@@ -54,11 +54,11 @@ func (p *n8nProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 		Description: "Interact with n8n API to manage credentials and other resources.",
 		Attributes: map[string]schema.Attribute{
 			"host": schema.StringAttribute{
-				Description: "The n8n instance host URL (e.g., https://n8n.example.com). Can also be set via N8N_HOST environment variable.",
+				Description: "The n8n instance host URL (e.g., https://n8n.example.com).",
 				Required:    true,
 			},
 			"api_key": schema.StringAttribute{
-				Description: "The API key for authenticating with n8n. Can also be set via N8N_API_KEY environment variable.",
+				Description: "The API key for authenticating with n8n.",
 				Required:    true,
 				Sensitive:   true,
 			},
@@ -89,7 +89,7 @@ func (p *n8nProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			path.Root("host"),
 			"Unknown n8n API Host",
 			"The provider cannot create the n8n API client as there is an unknown configuration value for the n8n API host. "+
-				"Either apply the source of the value first, set the value statically in the configuration, or use the N8N_HOST environment variable.",
+				"Either apply the source of the value first, or set the value statically in the configuration.",
 		)
 	}
 
@@ -98,7 +98,7 @@ func (p *n8nProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			path.Root("api_key"),
 			"Unknown n8n API Key",
 			"The provider cannot create the n8n API client as there is an unknown configuration value for the n8n API key. "+
-				"Either apply the source of the value first, set the value statically in the configuration, or use the N8N_API_KEY environment variable.",
+				"Either apply the source of the value first, or set the value statically in the configuration.",
 		)
 	}
 

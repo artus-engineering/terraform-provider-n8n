@@ -6,14 +6,13 @@ A Terraform provider for managing n8n resources, starting with credential manage
 
 ## Features
 
-- **Credential Management**: Create, read, update, and delete n8n credentials
-- **Secure**: Credential data is marked as sensitive and handled securely
-- **Modern**: Built with Terraform Plugin Framework (latest best practices)
+> **Note**: This is an early and minimal provider. It does not support all n8n resources but is under development and will be extended step by step.
+
+- **Credential Management**: Manage n8n credentials
 
 ## Requirements
 
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.21 (to build the provider plugin)
 - n8n instance with API access enabled
 - n8n API Key (can be generated in your n8n instance settings)
 
@@ -28,7 +27,6 @@ terraform {
   required_providers {
     n8n = {
       source  = "artus-engineering/n8n"
-      version = "~> 1.0"
     }
   }
 }
@@ -41,13 +39,6 @@ provider "n8n" {
   host    = "https://your-n8n-instance.com"
   api_key = "your-api-key-here"
 }
-```
-
-Or use environment variables:
-
-```bash
-export N8N_HOST="https://your-n8n-instance.com"
-export N8N_API_KEY="your-api-key"
 ```
 
 ### 3. Create Your First Credential
@@ -122,13 +113,6 @@ provider "n8n" {
 }
 ```
 
-### Environment Variables
-
-You can also configure the provider using environment variables:
-
-- `N8N_HOST`: The n8n instance host URL
-- `N8N_API_KEY`: The API key for authenticating with n8n
-
 ### Using Variables
 
 Instead of hardcoding credentials, use Terraform variables:
@@ -151,14 +135,7 @@ provider "n8n" {
 }
 ```
 
-Set them via environment variables or a `.tfvars` file:
-
-```bash
-# Using environment variables
-export N8N_HOST="https://your-n8n-instance.com"
-export N8N_API_KEY="your-api-key"
-terraform apply
-```
+Set them via a `.tfvars` file:
 
 ```hcl
 # terraform.tfvars
@@ -297,11 +274,11 @@ resource "n8n_credential" "example" {
 
 ### Error: "Missing n8n API Host"
 
-Make sure you've set the `host` parameter in your provider configuration or the `N8N_HOST` environment variable.
+Make sure you've set the `host` parameter in your provider configuration.
 
 ### Error: "Missing n8n API Key"
 
-Ensure you've provided the `api_key` parameter or set the `N8N_API_KEY` environment variable.
+Ensure you've provided the `api_key` parameter in your provider configuration.
 
 ### Error: "API error (status 401)"
 

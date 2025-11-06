@@ -16,8 +16,8 @@ Interact with n8n API to manage credentials and other resources.
 
 ### Required
 
-- `api_key` (String, Sensitive) The API key for authenticating with n8n. Can also be set via N8N_API_KEY environment variable.
-- `host` (String) The n8n instance host URL (e.g., https://n8n.example.com). Can also be set via N8N_HOST environment variable.
+- `api_key` (String, Sensitive) The API key for authenticating with n8n.
+- `host` (String) The n8n instance host URL (e.g., https://n8n.example.com).
 
 ### Optional
 
