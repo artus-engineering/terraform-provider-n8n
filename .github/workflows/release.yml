@@ -170,6 +170,5 @@ jobs:
                   files: |
                       dist/terraform-provider-n8n_*
                       dist/terraform-registry-manifest.json
-                      dist/terraform-provider-n8n_*_SHA256SUMS*
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
