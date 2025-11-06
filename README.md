@@ -15,10 +15,11 @@ A Terraform provider for managing n8n resources, starting with credential manage
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.21 (to build the provider plugin)
 - n8n instance with API access enabled
+- n8n API Key (can be generated in your n8n instance settings)
 
-## Installation
+## Quick Start
 
-### Using Terraform CLI Configuration File
+### 1. Install the Provider
 
 Add the provider to your Terraform configuration:
 
@@ -33,7 +34,52 @@ terraform {
 }
 ```
 
+### 2. Configure the Provider
+
+```hcl
+provider "n8n" {
+  host    = "https://your-n8n-instance.com"
+  api_key = "your-api-key-here"
+}
+```
+
+Or use environment variables:
+
+```bash
+export N8N_HOST="https://your-n8n-instance.com"
+export N8N_API_KEY="your-api-key"
+```
+
+### 3. Create Your First Credential
+
+```hcl
+resource "n8n_credential" "example" {
+  name = "my-http-basic-auth"
+  type = "httpBasicAuth"
+  data = jsonencode({
+    user     = "username"
+    password = "password"
+  })
+}
+```
+
+### 4. Initialize and Apply
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+## Installation
+
+### From Terraform Registry (Recommended)
+
+Once published, the provider will be available directly from the Terraform Registry. Simply add it to your `required_providers` block as shown in the Quick Start section.
+
 ### Building from Source
+
+If you need to build from source:
 
 1. Clone the repository:
 ```bash
@@ -49,6 +95,19 @@ make build
 3. Install locally:
 ```bash
 make install
+```
+
+### Development Override
+
+For local development, you can use a development override in your `~/.terraformrc`:
+
+```
+provider_installation {
+  dev_overrides {
+    "artus-engineering/n8n" = "/path/to/terraform-provider-n8n"
+  }
+  direct {}
+}
 ```
 
 ## Configuration
@@ -69,6 +128,43 @@ You can also configure the provider using environment variables:
 
 - `N8N_HOST`: The n8n instance host URL
 - `N8N_API_KEY`: The API key for authenticating with n8n
+
+### Using Variables
+
+Instead of hardcoding credentials, use Terraform variables:
+
+```hcl
+variable "n8n_host" {
+  description = "n8n instance URL"
+  type        = string
+}
+
+variable "n8n_api_key" {
+  description = "n8n API key"
+  type        = string
+  sensitive   = true
+}
+
+provider "n8n" {
+  host    = var.n8n_host
+  api_key = var.n8n_api_key
+}
+```
+
+Set them via environment variables or a `.tfvars` file:
+
+```bash
+# Using environment variables
+export N8N_HOST="https://your-n8n-instance.com"
+export N8N_API_KEY="your-api-key"
+terraform apply
+```
+
+```hcl
+# terraform.tfvars
+n8n_host   = "https://your-n8n-instance.com"
+n8n_api_key = "your-api-key"
+```
 
 ## Usage
 
@@ -121,6 +217,47 @@ resource "n8n_credential" "http_header" {
 }
 ```
 
+### Creating Multiple Credentials
+
+```hcl
+# HTTP Basic Auth
+resource "n8n_credential" "http_basic" {
+  name = "api-basic-auth"
+  type = "httpBasicAuth"
+  data = jsonencode({
+    user     = "api_user"
+    password = "secure_password"
+  })
+}
+
+# OAuth2
+resource "n8n_credential" "oauth2" {
+  name = "oauth2-credential"
+  type = "oAuth2Api"
+  data = jsonencode({
+    clientId                  = "client-id"
+    clientSecret              = "client-secret"
+    accessTokenUrl            = "https://api.example.com/oauth/token"
+    authUrl                   = "https://api.example.com/oauth/authorize"
+    scope                     = "read write"
+    authQueryParameters       = ""
+    sendAdditionalBodyProperties = false
+    additionalBodyProperties  = ""
+  })
+  nodes_access = ["httpRequest"]
+}
+
+# HTTP Header Auth
+resource "n8n_credential" "header_auth" {
+  name = "bearer-token"
+  type = "httpHeaderAuth"
+  data = jsonencode({
+    name  = "Authorization"
+    value = "Bearer your-token-here"
+  })
+}
+```
+
 ## Resources
 
 ### `n8n_credential`
@@ -155,6 +292,24 @@ resource "n8n_credential" "example" {
   })
 }
 ```
+
+## Troubleshooting
+
+### Error: "Missing n8n API Host"
+
+Make sure you've set the `host` parameter in your provider configuration or the `N8N_HOST` environment variable.
+
+### Error: "Missing n8n API Key"
+
+Ensure you've provided the `api_key` parameter or set the `N8N_API_KEY` environment variable.
+
+### Error: "API error (status 401)"
+
+Your API key is invalid or expired. Generate a new one in your n8n instance settings.
+
+### Error: "API error (status 404)"
+
+The n8n API endpoint might be incorrect, or your n8n instance doesn't have the API enabled. Check your n8n configuration.
 
 ## Development
 
@@ -212,3 +367,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [n8n API Documentation](https://docs.n8n.io/api/)
 - [Terraform Plugin Framework Documentation](https://developer.hashicorp.com/terraform/plugin/framework)
+- Check out the [examples](./examples/) directory for more use cases
