@@ -26,6 +26,12 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: go-docs
+        name: Generate Documentation (make docs)
+        entry: bash -c 'make docs'
+        language: system
+        pass_filenames: false
+        always_run: true
 
   # Terraform formatting
   - repo: https://github.com/antonbabenko/pre-commit-terraform
