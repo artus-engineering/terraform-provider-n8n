@@ -169,6 +169,7 @@ func (r *credentialResource) Schema(_ context.Context, _ resource.SchemaRequest,
 					"auth_query_parameters": schema.StringAttribute{
 						Description: "Additional query parameters for the authorization request.",
 						Optional:    true,
+						Computed:    true,
 						Default:     stringdefault.StaticString(""),
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.RequiresReplace(),
@@ -177,6 +178,7 @@ func (r *credentialResource) Schema(_ context.Context, _ resource.SchemaRequest,
 					"send_additional_body_properties": schema.BoolAttribute{
 						Description: "Whether to send additional body properties.",
 						Optional:    true,
+						Computed:    true,
 						Default:     booldefault.StaticBool(false),
 						PlanModifiers: []planmodifier.Bool{
 							&requiresReplaceBoolModifier{},
@@ -185,6 +187,7 @@ func (r *credentialResource) Schema(_ context.Context, _ resource.SchemaRequest,
 					"additional_body_properties": schema.StringAttribute{
 						Description: "Additional body properties to send.",
 						Optional:    true,
+						Computed:    true,
 						Default:     stringdefault.StaticString(""),
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.RequiresReplace(),

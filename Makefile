@@ -47,6 +47,7 @@ clean:
 docs:
 	@echo "==> Generating documentation..."
 	@go generate ./...
+	@echo "==> Documentation generated in docs/ directory"
 
 # Run pre-commit hooks on all files
 pre-commit:

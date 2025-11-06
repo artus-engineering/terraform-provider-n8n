@@ -55,11 +55,11 @@ func (p *n8nProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 		Attributes: map[string]schema.Attribute{
 			"host": schema.StringAttribute{
 				Description: "The n8n instance host URL (e.g., https://n8n.example.com). Can also be set via N8N_HOST environment variable.",
-				Optional:    true,
+				Required:    true,
 			},
 			"api_key": schema.StringAttribute{
 				Description: "The API key for authenticating with n8n. Can also be set via N8N_API_KEY environment variable.",
-				Optional:    true,
+				Required:    true,
 				Sensitive:   true,
 			},
 			"insecure": schema.BoolAttribute{
@@ -106,33 +106,23 @@ func (p *n8nProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	// Default values
-	host := "http://localhost:5678"
-	apiKey := ""
+	// Get required values (they are required in schema, so they should be present)
+	host := config.Host.ValueString()
+	apiKey := config.APIKey.ValueString()
+
+	// Get optional insecure value
 	insecure := false
-
-	if !config.Host.IsNull() {
-		host = config.Host.ValueString()
-	}
-
-	if !config.APIKey.IsNull() {
-		apiKey = config.APIKey.ValueString()
-	}
-
 	if !config.Insecure.IsNull() {
 		insecure = config.Insecure.ValueBool()
 	}
 
-	// If any of the expected configurations are missing, return
-	// errors with provider-specific guidance.
-
+	// Validate that required values are not empty
 	if host == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("host"),
 			"Missing n8n API Host",
-			"The provider cannot create the n8n API client as there is a missing or empty value for the n8n API host. "+
-				"Set the host value in the configuration or use the N8N_HOST environment variable. "+
-				"If either is already set, ensure the value is not empty.",
+			"The provider cannot create the n8n API client as there is an empty value for the n8n API host. "+
+				"Ensure the host value is not empty.",
 		)
 	}
 
@@ -140,9 +130,8 @@ func (p *n8nProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_key"),
 			"Missing n8n API Key",
-			"The provider cannot create the n8n API client as there is a missing or empty value for the n8n API key. "+
-				"Set the api_key value in the configuration or use the N8N_API_KEY environment variable. "+
-				"If either is already set, ensure the value is not empty.",
+			"The provider cannot create the n8n API client as there is an empty value for the n8n API key. "+
+				"Ensure the api_key value is not empty.",
 		)
 	}
 
