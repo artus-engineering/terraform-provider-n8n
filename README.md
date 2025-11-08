@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Terraform Registry](https://img.shields.io/github/v/release/artus-engineering/terraform-provider-n8n?label=Latest%20Version)](https://registry.terraform.io/providers/artus-engineering/n8n/latest) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Test](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml/badge.svg)](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml)
+[![Terraform Registry](https://img.shields.io/github/v/release/artus-engineering/terraform-provider-n8n?label=Latest%20Version)](https://registry.terraform.io/providers/artus-engineering/n8n/latest) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Test](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml/badge.svg)](https://github.com/artus-engineering/terraform-provider-n8n/actions/workflows/test.yml) [![Quality Gate Status](https://sonar.artus-engineering.de/api/project_badges/measure?project=artus-engineering_terraform-provider-n8n_0ab13d05-c6e9-4bd3-bdc1-05b79b09c95a&metric=alert_status&token=sqb_8a72d31352668cb55ce5331385e287ec46458a68)](https://sonar.artus-engineering.de/dashboard?id=artus-engineering_terraform-provider-n8n_0ab13d05-c6e9-4bd3-bdc1-05b79b09c95a)
 
 </div>
 

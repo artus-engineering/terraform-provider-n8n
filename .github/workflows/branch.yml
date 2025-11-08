@@ -1,22 +1,26 @@
-name: Test
+name: Branch
 
 on:
   push:
     branches:
       - main
   pull_request:
+    branches:
+      - main
     paths:
       - main.go
       - go.*
       - internal/**
       - Makefile
-      - .github/workflows/test.yml
+      - .github/workflows/branch.yml
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -53,3 +57,21 @@ jobs:
         run: |
           go fmt ./...
           terraform fmt -check -recursive ./examples/
+
+  scan:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Analyze with SonarQube
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: -Dsonar.projectKey=artus-engineering_terraform-provider-n8n_0ab13d05-c6e9-4bd3-bdc1-05b79b09c95a
